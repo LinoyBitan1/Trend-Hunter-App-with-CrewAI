@@ -1,7 +1,16 @@
-from crewai import Agent, Crew, Process, Task
+from crewai import Agent, Crew, Process, Task, TaskOutput
 from crewai.project import CrewBase, agent, crew, task
 
 from trend_hunter_crewai.llm_config import llm
+
+chat_interface = None
+
+
+# This function will be called after every task finishes
+def print_output(output: TaskOutput):
+    if chat_interface:
+        message = output.raw  # get raw text
+        chat_interface.send(message, user=output.agent, respond=False)
 
 
 @CrewBase
@@ -39,12 +48,14 @@ class TrendHunterApp:
     def search_task(self) -> Task:
         return Task(
             config=self.tasks_config["search_task"],
+            callback=print_output,
         )
 
     @task
     def analysis_task(self) -> Task:
         return Task(
             config=self.tasks_config["analysis_task"],
+            callback=print_output,
         )
 
     @task
@@ -52,6 +63,7 @@ class TrendHunterApp:
         return Task(
             config=self.tasks_config["report_task"],
             output_file="trend_report.md",
+            callback=print_output,
         )
 
     @crew
