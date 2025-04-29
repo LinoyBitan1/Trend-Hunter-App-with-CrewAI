@@ -1,54 +1,109 @@
 # TrendHunterCrewai Crew
 
-Welcome to the TrendHunterCrewai Crew project, powered by [crewAI](https://crewai.com). This template is designed to help you set up a multi-agent AI system with ease, leveraging the powerful and flexible framework provided by crewAI. Our goal is to enable your agents to collaborate effectively on complex tasks, maximizing their collective intelligence and capabilities.
+An AI-powered application that autonomously hunts trending topics, analyzes the information,
+and generates concise reports — all driven by CrewAI agents and a custom vLLM model hosted on OpenShift AI.
 
-## Installation
+## Table of Contents
 
-Ensure you have Python >=3.10 <3.13 installed on your system. This project uses [UV](https://docs.astral.sh/uv/) for dependency management and package handling, offering a seamless setup and execution experience.
+- Installation and Setup
+- Connecting to the Hosted Model
+- Designing Agents and Tasks
+- Running the Application
 
-First, if you haven't already, install uv:
+## Installation and Setup
 
-```bash
-pip install uv
-```
-
-Next, navigate to your project directory and install the dependencies:
-
-(Optional) Lock the dependencies and install them by using the CLI command:
-```bash
-crewai install
-```
-### Customizing
-
-**Add your `OPENAI_API_KEY` into the `.env` file**
-
-- Modify `src/trend_hunter_crewai/config/agents.yaml` to define your agents
-- Modify `src/trend_hunter_crewai/config/tasks.yaml` to define your tasks
-- Modify `src/trend_hunter_crewai/crew.py` to add your own logic, tools and specific args
-- Modify `src/trend_hunter_crewai/main.py` to add custom inputs for your agents and tasks
-
-## Running the Project
-
-To kickstart your crew of AI agents and begin task execution, run this from the root folder of your project:
+Install the required packages:
 
 ```bash
-$ crewai run
+pip install crewai crewai-tools
 ```
 
-This command initializes the Trend-Hunter-CrewAI Crew, assembling the agents and assigning them tasks as defined in your configuration.
+Or with [uv](https://github.com/astral-sh/uv):
 
-This example, unmodified, will run the create a `report.md` file with the output of a research on LLMs in the root folder.
+```bash
+uv tool install crewai
+```
 
-## Understanding Your Crew
+For more information, check the [official CrewAI installation guide](https://docs.crewai.com/installation).
 
-The Trend-Hunter-CrewAI Crew is composed of multiple AI agents, each with unique roles, goals, and tools. These agents collaborate on a series of tasks, defined in `config/tasks.yaml`, leveraging their collective skills to achieve complex objectives. The `config/agents.yaml` file outlines the capabilities and configurations of each agent in your crew.
+## Connecting to the Hosted Model
 
-## Support
+Make sure your model is deployed on OpenShift AI. Then, configure the following environment variables in a `.env` file:
 
-For support, questions, or feedback regarding the TrendHunterCrewai Crew or crewAI.
-- Visit our [documentation](https://docs.crewai.com)
-- Reach out to us through our [GitHub repository](https://github.com/joaomdmoura/crewai)
-- [Join our Discord](https://discord.com/invite/X4JWnZnxPb)
-- [Chat with our docs](https://chatg.pt/DWjSBZn)
+```env
+OPENAI_API_BASE=https://<your-model-endpoint>/v1
+OPENAI_API_KEY=EMPTY  # Or your authentication token
+```
 
-Let's create wonders together with the power and simplicity of crewAI.
+Initialize the LLM:
+
+```python
+from crewai import LLM
+import os
+
+llm = LLM(
+    model="openai/my-vlllm2",
+    openai_api_base=os.getenv("OPENAI_API_BASE"),
+    api_key=os.getenv("OPENAI_API_KEY")
+)
+```
+
+Or using LangChain:
+
+```python
+from langchain_community.llms import VLLMOpenAI
+from dotenv import load_dotenv
+
+load_dotenv()
+
+llm = VLLMOpenAI(
+    openai_api_key=os.getenv("OPENAI_API_KEY"),
+    openai_api_base=os.getenv("OPENAI_API_BASE"),
+    model="openai/my-vlllm2",
+    temperature=0,
+)
+```
+
+> Make sure the `model` name matches the one you created inside OpenShift AI.
+
+## Designing Agents and Tasks
+
+The application is built using three agents:
+
+- **SearchAgent**: Searches for the latest articles about a given trend.
+- **AnalysisAgent**: Analyzes and ranks articles by relevance and popularity.
+- **ReportAgent**: Summarizes the analysis into a trend report.
+
+Agent and task configurations are defined in YAML files:
+
+- `config/agents.yaml`
+- `config/tasks.yaml`
+
+## Running the Application - CLI mode
+
+Run the app with:
+
+```bash
+crewai run
+```
+
+You will be prompted to enter a trend topic.  
+The app will:
+
+1. Search for related articles.
+2. Analyze and rank them.
+3. Generate a summarized trend report (`trend_report.md`).
+
+## Running the Application - UI
+
+To run the interactive UI version using Panel:
+
+$ PYTHONPATH=src panel serve src/trend_hunter_crewai/app_ui.py --autoreload --port 5006
+
+Once the UI loads in your browser, you'll be greeted by a chatbot interface.
+
+1. You can enter a trend topic
+2. The system will run all agents (Search, Analysis, Report).
+3. Display each agent’s response in the chat.
+4. Output the final trend report.
+5. Prompt you to enter a new topic.
