@@ -28,8 +28,6 @@ def initiate_chat(message):
         }
         crew = TrendHunterApp().crew()
         result = crew.kickoff(inputs=inputs)
-        # Final result is optional to show again
-        chat_interface.send(f"Final Result:\n{result}", user="Assistant", respond=False)
         # After the full crew finishes, send a final message
         chat_interface.send(
             "The trend analysis is complete! You can enter another topic now.",

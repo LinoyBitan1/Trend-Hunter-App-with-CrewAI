@@ -3,7 +3,12 @@ from crewai.project import CrewBase, agent, crew, task
 
 from trend_hunter_crewai.llm_config import llm
 
+from crewai_tools import SerperDevTool, WebsiteSearchTool
+
 chat_interface = None
+
+search_tool = SerperDevTool()
+web_rag_tool = WebsiteSearchTool()
 
 
 # This function will be called after every task finishes
@@ -26,6 +31,9 @@ class TrendHunterApp:
             config=self.agents_config["search_agent"],
             llm=llm,
             verbose=True,
+            tools=[search_tool, web_rag_tool],
+            allow_self_reflection=True,
+            max_iterations=5,
         )
 
     @agent
@@ -49,6 +57,7 @@ class TrendHunterApp:
         return Task(
             config=self.tasks_config["search_task"],
             callback=print_output,
+            tools=[search_tool, web_rag_tool],
         )
 
     @task

@@ -8,6 +8,7 @@ load_dotenv()
 llm = VLLMOpenAI(
     openai_api_key=os.getenv("OPENAI_API_KEY"),
     openai_api_base=os.getenv("OPENAI_API_BASE"),
-    model="openai/my-vlllm3",
+    model="openai/hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
     temperature=0,
+    max_tokens=400,
 )
