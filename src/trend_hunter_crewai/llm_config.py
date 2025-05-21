@@ -10,5 +10,5 @@ llm = VLLMOpenAI(
     openai_api_base=os.getenv("OPENAI_API_BASE"),
     model="openai/hugging-quants/Meta-Llama-3.1-70B-Instruct-AWQ-INT4",
     temperature=0,
-    max_tokens=400,
+    max_tokens=500,
 )

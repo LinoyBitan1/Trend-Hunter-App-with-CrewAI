@@ -1,3 +1,11 @@
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+from langtrace_python_sdk import langtrace
+
+langtrace.init(api_key=os.getenv("LANGTRACE_KEY"))
+
 from crewai import Agent, Crew, Process, Task, TaskOutput
 from crewai.project import CrewBase, agent, crew, task
 
@@ -42,6 +50,7 @@ class TrendHunterApp:
             config=self.agents_config["analysis_agent"],
             llm=llm,
             verbose=True,
+            max_iterations=5,
         )
 
     @agent
@@ -50,6 +59,7 @@ class TrendHunterApp:
             config=self.agents_config["report_agent"],
             llm=llm,
             verbose=True,
+            max_iterations=5,
         )
 
     @task
